@@ -1,0 +1,26 @@
+!!!
+%html
+  %head
+    %title CRM
+    %meta{name: "viewport", content: "width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"}
+    %meta{name: "mobile-web-app-capable", content:"yes"}
+    %meta{name: "apple-mobile-web-app-capable", content:"yes"}
+    = stylesheet_link_tag 'universal_access/application'    
+    = yield :head_javascript
+    = csrf_meta_tags
+    = javascript_include_tag "https://use.fontawesome.com/1718d2531c.js"
+    
+  %body
+    %section#main-wrapper.theme-blue
+      %header#header
+        .brand
+          %a.logo
+            <span>Universal</span>Access
+      %aside.sidebar.sidebar-left
+      %section.main-content-wrapper
+        %section#main-content
+          .panel
+            .panel-body= yield
+              
+    = javascript_include_tag "universal_access/application"
+    = yield :javascript

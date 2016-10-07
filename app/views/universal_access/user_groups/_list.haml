@@ -1,0 +1,17 @@
+- if @user_groups.any?
+  = table(header: ['Group', 'Users', 'Edit'], class: 'small table-condensed') do
+    - @user_groups.each do |user_group|
+      %tr
+        %td
+          = user_group.name
+          .text-muted= user_group.notes
+        %td
+          = link_to icon('user'), universal_access.users_user_group_path(user_group), :remote => true
+          .small
+            %small.text-muted= user_group.users.map{|u| u.name}.join(', ')
+        %td
+          - if user_group.locked
+            .pull-left= icon('lock')
+          = link_to icon('pencil'), universal_access.edit_user_group_path(user_group)
+- else
+  .alert.alert-warning There are no user groups to list

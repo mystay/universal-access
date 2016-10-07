@@ -1,0 +1,10 @@
+.row
+  .col-md-7
+    = panel(title: 'Groups', icon: 'cog') do
+      #user_group_list= render 'list'
+        
+      
+  .col-md-5
+    #model_support
+    #model_form
+      = render 'new'

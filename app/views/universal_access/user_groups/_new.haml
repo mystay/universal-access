@@ -1,0 +1,6 @@
+.panel.panel-info
+  .panel-heading
+    %h3.panel-title New Group
+  .panel-body
+    = form_for UniversalAccess::UserGroup.new, url: universal_access.user_groups_path, html: {class: 'form-horizontal form-border', id: 'new_user_group_form'} do
+      = render 'form'

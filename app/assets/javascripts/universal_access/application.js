@@ -1,0 +1,12 @@
+//= require jquery
+//= require jquery_ujs
+//= require bootstrap-sprockets
+//= require ./jquery-ui.min
+//= require ./jquery.nogoco.min
+//= require ./switchery.min
+//= require ./pace.min
+//= require ./jquery.fullscreen.min
+//= require ./underscore
+//= require ./backbone
+//= require ./messenger
+//= require_tree .

@@ -1,0 +1,43 @@
+= panel(title: "Users in '#{@user_group.name}'", class: 'success small') do
+  - if @users.empty?
+    .alert.alert-warning
+      There are no users in this group.
+  - else  
+    = table(header: ['Name/Email', '']) do
+      - @users.each do |user|
+        %tr{id: "row_#{user.id}"}
+          %td
+            = user.name
+            .small= user.email
+          %td= link_to icon('trash-o'), universal_access.remove_user_user_group_path(@user_group, user_id: user.id), remote: true, method: :delete, data: {confirm: 'Are you sure you want to remove this user from this group?'}
+  %hr
+  %h5 Add an existing user to this group:
+  = form_tag universal_access.add_user_user_group_path(@user_group), remote: true, class: 'form' do
+    .input-group
+      = text_field_tag 'user_search', '', placeholder: 'Search by name or email', class: 'form-control'
+      .input-group-btn= submit_tag('Add user', class: 'btn btn-primary')
+    = hidden_field_tag :user_id
+    
+  .hidden
+    %hr{style: 'margin-bottom:40px;'}
+    %h5 Invite a new user:
+    %p.text-info If the user is not currently registered, please enter an email below and an invitation email will be sent.
+    = form_tag universal_access.invite_user_user_group_path(@user_group), remote: true, class: 'form' do
+      .input-group
+        = text_field_tag :invite_email, '', placeholder: 'Email address...', class: 'form-control'
+        .input-group-btn= submit_tag('Send invite', class: 'btn btn-primary')
+  
+:javascript
+  $( "#user_search" ).autocomplete({
+    source: "/universal_access/users/autocomplete",
+    minLength: 3,
+    autoFocus: true,
+    delay: 200,
+    select: function(event, ui){
+      event.preventDefault();
+      $("#user_id").val(ui.item.value);
+      $('#user_search').blur();
+      $('#user_search').val(ui.item.label);
+    },
+    focus: function(event, ui){event.preventDefault();}
+  });

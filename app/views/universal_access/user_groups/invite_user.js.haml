@@ -1,0 +1,7 @@
+- if @user.valid?
+  $("#model_support").html("#{escape_javascript(render 'users')}");
+  $("#invite_email").val('');
+  showSuccess("User created and email sent")
+- else
+  showErrorMessage("Error:<br />#{@user.errors.full_messages.map{|c| c}.join('<br/>').html_safe}")
+  

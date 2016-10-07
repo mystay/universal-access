@@ -1,0 +1,7 @@
+= UniversalAccess
+
+=== Setup a user model to have Group Access
+    class User
+      include UniversalAccess::Concerns::GroupAccess
+      
+    end
