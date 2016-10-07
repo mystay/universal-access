@@ -10,10 +10,10 @@ module UniversalAccess
         def set_user_group!(user_group, yes_no=true)
           user_group = ::UniversalAccess::UserGroup.find(user_group) if user_group.class == String
           if !user_group.nil?
-            if self.user_group_ids.nil?
+            if self._ugid.nil?
               self.update(_ugid: [user_group.id.to_s])
             elsif yes_no
-              self.push(_ugid: user_group.id.to_s) if !self.user_groups.include?(user_group)
+              self.push(_ugid: user_group.id.to_s) if !self.universal_user_groups.include?(user_group)
             else !yes_no
               logger.debug "PULL"
               self.pull(_ugid: user_group.id.to_s)
@@ -24,7 +24,7 @@ module UniversalAccess
 
         def update_user_group_functions!
           fun = {}
-          user_groups = ::UniversalAccess::UserGroup.in(id: self.user_group_ids)
+          user_groups = ::UniversalAccess::UserGroup.in(id: self._ugid)
           user_groups.each do |group|
             if !group.functions.nil?
               group.functions.each do |function|
@@ -40,13 +40,13 @@ module UniversalAccess
         end
 
         #find the groups that this user belongs to
-        def user_groups
-          return [] if self.user_group_ids.nil? or self.user_group_ids.empty?
-          @user_groups ||= ::UniversalAccess::UserGroup.in(id: self.user_group_ids).cache
+        def universal_user_groups
+          return [] if self._ugid.nil? or self._ugid.empty?
+          @user_groups ||= ::UniversalAccess::UserGroup.in(id: self._ugid).cache
         end
 
-        def user_group_codes
-          self.user_groups.map(&:code)
+        def universal_user_group_codes
+          self.universal_user_groups.map(&:code)
         end
 
         def user_group_function_categories
@@ -64,7 +64,7 @@ module UniversalAccess
         def in_universal_group?(group_codes=[])
           group_codes = [group_codes.to_s] if group_codes.class == String or group_codes.class == Symbol
           group_codes = group_codes.map{|c| c.to_s}
-          groups = self.user_groups
+          groups = self.universal_user_groups
           groups = groups.select{|g| group_codes.include?(g.code)}
           return groups.any?
         end
