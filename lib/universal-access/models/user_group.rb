@@ -7,6 +7,8 @@ module UniversalAccess
         include Mongoid::Document
         
         include Universal::Concerns::Scoped
+        
+        store_in collection: UniversalAccess::Configuration.user_group_collection
 
         field :code
         field :name

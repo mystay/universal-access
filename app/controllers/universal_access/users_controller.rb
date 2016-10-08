@@ -4,13 +4,14 @@ module UniversalAccess
   class UsersController < ApplicationController
 
     def index
-      #list users who have access to a certain group by the group code
-      @user_group = UniversalAccess::UserGroup.find_by(code: params[:code])
-      users = []
-      if @user_group
-        users = @user_group.users.sort_by{|a| a.name}.map{|u| {name: u.name, email: u.email, first_name: u.name.split(' ')[0].titleize, id: u.id.to_s, functions: u.user_group_functions}}
-      end
-      render json: users      
+      #list users who have access to functions under the 'crm' category
+      users = Universal::Configuration.class_name_user.classify.constantize.where('_ugf.crm.0' => {'$exists' => true})
+      users = users.sort_by{|a| a.name}.map{|u| {name: u.name, 
+          email: u.email, 
+          first_name: u.name.split(' ')[0].titleize, 
+          id: u.id.to_s, 
+          functions: (u.user_group_functions.blank? ? [] : u.user_group_functions['crm'])}}
+      render json: users
     end
     
     def autocomplete
