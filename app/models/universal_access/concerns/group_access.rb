@@ -4,8 +4,8 @@ module UniversalAccess
       extend ActiveSupport::Concern
 
       included do
-        field :_ugid, as: :user_group_ids, type: Array
-        field :_ugf, as: :user_group_functions, type: Hash
+        field :_ugid, as: :universal_user_group_ids, type: Array
+        field :_ugf, as: :universal_user_group_functions, type: Hash
 
         def set_user_group!(user_group, yes_no=true)
           user_group = ::UniversalAccess::UserGroup.find(user_group) if user_group.class == String
@@ -36,7 +36,7 @@ module UniversalAccess
               end
             end
           end
-          self.update(user_group_functions: fun)
+          self.update(_ugf: fun)
         end
 
         #find the groups that this user belongs to
@@ -50,14 +50,14 @@ module UniversalAccess
         end
 
         def user_group_function_categories
-          return self.user_group_functions.map{|f| f.to_a[0]} if !self.user_group_functions.nil?
+          return self._ugf.map{|f| f.to_a[0]} if !self._ugf.nil?
           []
         end
 
         #check if a user has this function
         def has?(category, function)
-          !self.user_group_functions.nil? and
-            (!self.user_group_functions[category.to_s].nil? and self.user_group_functions[category.to_s].include?(function.to_s))
+          !self._ugf.nil? and
+            (!self._ugf[category.to_s].nil? and self._ugf[category.to_s].include?(function.to_s))
         end
 
         #check if the user is in the group
