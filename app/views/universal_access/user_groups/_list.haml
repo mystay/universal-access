@@ -1,5 +1,5 @@
 - if @user_groups.any?
-  = table(header: ['Group', 'Code', 'Users', 'Edit'], class: 'small table-condensed') do
+  = table(header: ['Group', 'Code', 'Users', 'Edit'], class: 'table-condensed') do
     - @user_groups.each do |user_group|
       %tr
         %td
@@ -9,8 +9,7 @@
           = user_group.code
         %td
           = link_to icon('user'), universal_access.users_user_group_path(user_group), :remote => true
-          .small
-            %small.text-muted= user_group.users.map{|u| u.name}.join(', ')
+          .small.text-info= user_group.users.map{|u| u.name}.join(', ')
         %td
           - if user_group.locked
             .pull-left= icon('lock')
