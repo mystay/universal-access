@@ -55,9 +55,9 @@ module UniversalAccess
         end
 
         #check if a user has this function
-        def has?(category, function)
+        def has?(category, function=nil)
           !self._ugf.nil? and
-            (!self._ugf[category.to_s].nil? and self._ugf[category.to_s].include?(function.to_s))
+            (!self._ugf[category.to_s].nil? and (function.nil? or self._ugf[category.to_s].include?(function.to_s)))
         end
 
         #check if the user is in the group
