@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = UniversalAccess::VERSION
   s.authors     = ["Ben Petro"]
   s.email       = ["ben@bthree.com.au"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of UniversalAccess."
-  s.description = "TODO: Description of UniversalAccess."
+  s.homepage    = ""
+  s.summary     = "Summary of UniversalAccess."
+  s.description = "Description of UniversalAccess."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
