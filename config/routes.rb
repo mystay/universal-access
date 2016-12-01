@@ -1,5 +1,5 @@
 UniversalAccess::Engine.routes.draw do
-  root to: 'home#index'
+  root to: 'user_groups#index'
   
   resources :users do
     collection do
