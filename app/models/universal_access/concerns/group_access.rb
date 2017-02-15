@@ -15,7 +15,6 @@ module UniversalAccess
             elsif yes_no
               self.push(_ugid: user_group.id.to_s) if !self.universal_user_groups.include?(user_group)
             else !yes_no
-              logger.debug "PULL"
               self.pull(_ugid: user_group.id.to_s)
             end
           end
@@ -36,7 +35,7 @@ module UniversalAccess
               end
             end
           end
-          self.update(_ugf: fun)
+          self.set(_ugf: fun)
         end
 
         #find the groups that this user belongs to
