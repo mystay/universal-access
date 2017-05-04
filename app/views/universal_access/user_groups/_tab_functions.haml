@@ -5,11 +5,16 @@
       .clearfix
     .col-md-4.small
       = panel(title: category[0].to_s.titleize, class: 'info panel-bordered') do
+        .row
+          .col-md-1
+            = check_box_tag "select_all_#{category[0]}", 1, false, onchange: "selectAll(this.checked, 'cb_select_#{category[0]}');", class: "cb_select_#{category[0]}", title: 'Select all'
+          .col-md-10
+            %label{for: "select_all_#{category[0]}", style: 'font-weight:normal;'} Select all
         - category[1].each do |function|
           .row
             .col-md-1
               - selected = @user_group.nil? ? false : ((!@user_group.functions[category[0].to_s].blank? and @user_group.functions[category[0].to_s].include?(function[0].to_s)) ? true : false) if !@user_group.functions.nil?
-              = check_box_tag "functions[#{category[0]}][]", "#{function[0]}", selected, id: "function_#{category[0]}_#{function[0]}"
+              = check_box_tag "functions[#{category[0]}][]", "#{function[0]}", selected, id: "function_#{category[0]}_#{function[0]}", class: "cb_select_#{category[0]}"
             .col-md-10
               %label{for: "function_#{category[0]}_#{function[0]}", style: 'margin-bottom:0;'}= function[1].blank? ? function[0].titleize : function[1]
               %span.small.text-muted{style: 'font-size:8pt;'}= parenthesize function[0]
