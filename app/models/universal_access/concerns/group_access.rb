@@ -22,20 +22,22 @@ module UniversalAccess
         end
 
         def update_user_group_functions!
-          fun = {}
+          all_functions = {}
           user_groups = ::UniversalAccess::UserGroup.in(id: self._ugid)
           user_groups.each do |group|
+            scope_id = group.scope_id.blank? ? 'all' : group.scope_id.to_s
             if !group.functions.nil?
               group.functions.each do |function|
                 category = function[0]
-                existing_category = fun[category] || fun[category] = []
+                all_functions[category] ||= {}
+                existing_category = all_functions[category][scope_id] || all_functions[category][scope_id] = []
                 function[1].each do |func|
                   existing_category.push(func) if !existing_category.include?(func)
                 end
               end
             end
           end
-          self.set(_ugf: fun)
+          self.set(_ugf: all_functions)
         end
 
         #find the groups that this user belongs to
@@ -52,11 +54,48 @@ module UniversalAccess
           return self._ugf.map{|f| f.to_a[0]} if !self._ugf.nil?
           []
         end
+        
+        def scoped_universal_user_group_functions(scope)
+          return [] if self.universal_user_group_functions.blank? or scope.nil?
+          new_ugf = {}
+          self._ugf.each do |uu|
+            function_group = uu[0]
+            uu[1].each do |uuu|
+              if uuu[0].to_s == scope.id.to_s
+                new_ugf[function_group] ||= []
+                new_ugf[function_group] += uuu[1]
+                new_ugf[function_group].uniq!
+              end
+            end
+          end
+          return new_ugf
+        end
+        
+        def unscoped_user_group_functions
+          return nil if self._ugf.nil?
+          if @unscoped_user_group_functions.nil?
+            new_ugf = {}
+            self._ugf.each do |uu|
+              function_group = uu[0]
+              uu[1].each do |uuu|
+                new_ugf[function_group] ||= []
+                new_ugf[function_group] += uuu[1]
+                new_ugf[function_group].uniq!
+              end
+            end
+            @unscoped_user_group_functions = new_ugf
+          end
+          return @unscoped_user_group_functions
+        end
 
         #check if a user has this function
-        def has?(category, function=nil)
-          !self._ugf.nil? and
-            (!self._ugf[category.to_s].nil? and (function.nil? or self._ugf[category.to_s].include?(function.to_s)))
+        def has?(category, function=nil, scope='all')
+          return false if self._ugf.nil?
+          if scope.to_s=='all'
+            return (!self.unscoped_user_group_functions.nil? && !self.unscoped_user_group_functions[category.to_s].nil? and (function.nil? or self.unscoped_user_group_functions[category.to_s].include?(function.to_s)))
+          else
+            return (!self._ugf[category.to_s].nil? and !self._ugf[category.to_s][scope.id.to_s].nil? and (function.nil? or self._ugf[category.to_s][scope.id.to_s].include?(function.to_s)))
+          end
         end
 
         #check if the user is in the group
