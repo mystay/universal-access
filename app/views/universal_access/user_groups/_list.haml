@@ -1,12 +1,11 @@
 - if @user_groups.any?
-  = table(header: ['Group', 'Code', 'Users', 'Edit'], class: 'table-condensed') do
+  = table(header: %w(group users edit), class: 'table-condensed') do
     - @user_groups.each do |user_group|
       %tr
         %td
           = user_group.name
-          .text-muted= user_group.notes
-        %td
-          = user_group.code
+          %small.text-info (#{user_group.code})
+          .small.text-muted= user_group.notes
         %td
           = link_to icon('user'), universal_access.users_user_group_path(user_group), :remote => true
           .small.text-info= user_group.users.map{|u| u.name}.join(', ')

@@ -7,8 +7,12 @@ module UniversalAccess
         field :_ugid, as: :universal_user_group_ids, type: Array
         field :_ugf, as: :universal_user_group_functions, type: Hash
 
-        def set_user_group!(user_group, yes_no=true)
-          user_group = ::UniversalAccess::UserGroup.find(user_group) if user_group.class == String
+        def set_user_group!(user_group, yes_no=true, scope=nil)
+          if scope.nil?
+            user_group = ::UniversalAccess::UserGroup.find(user_group)||::UniversalAccess::UserGroup.find_by(code: user_group) if user_group.class == String
+          else
+            user_group = ::UniversalAccess::UserGroup.where(scope: scope).find(user_group)||::UniversalAccess::UserGroup.find_by(scope: scope, code: user_group) if user_group.class == String
+          end
           if !user_group.nil?
             if self._ugid.nil?
               self.update(_ugid: [user_group.id.to_s])
@@ -41,9 +45,9 @@ module UniversalAccess
         end
 
         #find the groups that this user belongs to
-        def universal_user_groups
+        def universal_user_groups(scope=nil)
           return [] if self._ugid.nil? or self._ugid.empty?
-          @user_groups ||= ::UniversalAccess::UserGroup.in(id: self._ugid).cache
+          @user_groups ||= ::UniversalAccess::UserGroup.in(id: self._ugid, scope: scope).cache
         end
 
         def universal_user_group_codes
@@ -90,11 +94,11 @@ module UniversalAccess
 
         #check if a user has this function
         def has?(category, function=nil, scope='all')
-          return false if self._ugf.nil?
+          return false if self._ugf.nil? or self._ugf[category.to_s].nil?
           if scope.to_s=='all'
             return (!self.unscoped_user_group_functions.nil? && !self.unscoped_user_group_functions[category.to_s].nil? and (function.nil? or self.unscoped_user_group_functions[category.to_s].include?(function.to_s)))
           else
-            return (!self._ugf[category.to_s].nil? and !self._ugf[category.to_s][scope.id.to_s].nil? and (function.nil? or self._ugf[category.to_s][scope.id.to_s].include?(function.to_s)))
+            return (self._ugf[category.to_s].class != Array and !self._ugf[category.to_s][scope.id.to_s].nil? and (function.nil? or self._ugf[category.to_s][scope.id.to_s].include?(function.to_s)))
           end
         end
 
