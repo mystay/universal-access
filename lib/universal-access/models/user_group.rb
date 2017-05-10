@@ -13,7 +13,7 @@ module UniversalAccess
         field :code
         field :name
         field :notes
-        field :functions, type: Hash
+        field :functions, type: Hash, default: {}
         field :locked, type: Boolean, default: false
 
         before_validation :update_relations

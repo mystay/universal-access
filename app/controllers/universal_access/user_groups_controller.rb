@@ -24,7 +24,7 @@ module UniversalAccess
     end
 
     def users
-      @users = @user_group.users
+      @users = @user_group.users.ordered
       render layout: false
     end
 

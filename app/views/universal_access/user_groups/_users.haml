@@ -1,22 +1,21 @@
 = panel(title: "Users in '#{@user_group.name}'", class: 'success') do
+  = form_tag universal_access.add_user_user_group_path(@user_group), remote: true, class: 'form', id: 'add_user_form' do
+    .input-group
+      = text_field_tag 'user_search', '', placeholder: 'Search by name or email to add to group', class: 'form-control'
+      .input-group-btn= submit_tag('Add user', class: 'btn btn-primary')
+    = hidden_field_tag :user_id
   - if @users.empty?
     .alert.alert-warning
       There are no users in this group.
   - else  
-    = table(header: ['Name/Email', '']) do
+    = table(header: %w(name email remove)) do
       - @users.each do |user|
-        %tr{id: "row_#{user.id}"}
+        %tr.small{id: "row_#{user.id}"}
           %td
             = user.name
-            .small= user.email
-          %td= link_to icon('trash-o'), universal_access.remove_user_user_group_path(@user_group, user_id: user.id), remote: true, method: :delete, data: {confirm: 'Are you sure you want to remove this user from this group?'}
-  %hr
-  %h5 Add an existing user to this group:
-  = form_tag universal_access.add_user_user_group_path(@user_group), remote: true, class: 'form' do
-    .input-group
-      = text_field_tag 'user_search', '', placeholder: 'Search by name or email', class: 'form-control'
-      .input-group-btn= submit_tag('Add user', class: 'btn btn-primary')
-    = hidden_field_tag :user_id
+          %td
+            = user.email
+          %td.text-center= link_to icon('trash-o'), universal_access.remove_user_user_group_path(@user_group, user_id: user.id), remote: true, method: :delete, data: {confirm: 'Are you sure you want to remove this user from this group?'}
     
   .hidden
     %hr{style: 'margin-bottom:40px;'}
@@ -38,6 +37,7 @@
       $("#user_id").val(ui.item.value);
       $('#user_search').blur();
       $('#user_search').val(ui.item.label);
+      $('#add_user_form').submit();
     },
     focus: function(event, ui){event.preventDefault();}
   });

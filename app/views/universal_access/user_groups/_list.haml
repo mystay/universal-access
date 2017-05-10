@@ -1,15 +1,20 @@
 - if @user_groups.any?
-  = table(header: %w(group users edit), class: 'table-condensed') do
+  = table(header: %w(group users functions edit), class: 'table-condensed') do
     - @user_groups.each do |user_group|
       %tr
-        %td
-          = user_group.name
-          %small.text-info (#{user_group.code})
+        %td{style: 'white-space: nowrap;'}
+          %strong= user_group.name
+          .small.text-info #{user_group.code}
           .small.text-muted= user_group.notes
         %td
-          = link_to icon('user'), universal_access.users_user_group_path(user_group), :remote => true
-          .small.text-info= user_group.users.map{|u| u.name}.join(', ')
-        %td
+          = link_to icon('user'), universal_access.users_user_group_path(user_group), remote: true
+          %small.text-info
+            = user_group.users[0,10].map{|u| u.name}.join(', ')
+            - if user_group.users.length>10
+              %b= link_to "+ #{user_group.users.length-10} more...", universal_access.users_user_group_path(user_group), remote: true
+        %td.small.text-warning
+          = user_group.functions.map{|c| "#{c[0].titleize} (#{c[1].length})"}.join(', ')
+        %td.text-center
           - if user_group.locked
             .pull-left= icon('lock')
           = link_to icon('pencil'), universal_access.edit_user_group_path(user_group)
