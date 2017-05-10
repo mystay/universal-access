@@ -1,2 +1,4 @@
+%h1 Group: #{@user_group.name}
+%hr
 = form_for @user_group, url: universal_access.user_group_path(@user_group), html: {class: 'form-horizontal form-border', id: 'edit_user_group_form'} do
   = tabs(tabs: %w(functions details))

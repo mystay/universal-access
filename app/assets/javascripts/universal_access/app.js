@@ -1,3 +1,16 @@
+
+function selectAll(checked, klass){
+  var cbs = $("." + klass);
+  for (var i=0; i<cbs.length;i++){
+    var cb = cbs[i];
+    if (checked){
+      cb.checked = true;
+    }
+    else{
+      cb.checked = false;
+    }
+  }
+}
 var app = function() {
 
     $(function() {
@@ -415,3 +428,4 @@ $(window).resize(function() {
     app.chartJs();
 
 });
+
