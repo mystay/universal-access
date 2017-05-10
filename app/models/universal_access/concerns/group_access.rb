@@ -8,10 +8,10 @@ module UniversalAccess
         field :_ugf, as: :universal_user_group_functions, type: Hash
 
         def set_user_group!(user_group, yes_no=true, scope=nil)
-          if scope.nil?
-            user_group = ::UniversalAccess::UserGroup.find(user_group)||::UniversalAccess::UserGroup.find_by(code: user_group) if user_group.class == String
-          else
+          if ::UniversalAccess::Configuration.scoped_user_groups and !scope.nil?
             user_group = ::UniversalAccess::UserGroup.where(scope: scope).find(user_group)||::UniversalAccess::UserGroup.find_by(scope: scope, code: user_group) if user_group.class == String
+          else
+            user_group = ::UniversalAccess::UserGroup.find(user_group)||::UniversalAccess::UserGroup.find_by(code: user_group) if user_group.class == String
           end
           if !user_group.nil?
             if self._ugid.nil?
@@ -28,15 +28,28 @@ module UniversalAccess
         def update_user_group_functions!
           all_functions = {}
           user_groups = ::UniversalAccess::UserGroup.in(id: self._ugid)
-          user_groups.each do |group|
-            scope_id = group.scope_id.blank? ? 'all' : group.scope_id.to_s
-            if !group.functions.nil?
-              group.functions.each do |function|
-                category = function[0]
-                all_functions[category] ||= {}
-                existing_category = all_functions[category][scope_id] || all_functions[category][scope_id] = []
-                function[1].each do |func|
-                  existing_category.push(func) if !existing_category.include?(func)
+          if ::UniversalAccess::Configuration.scoped_user_groups
+            user_groups.each do |group|
+              if !group.functions.nil?
+                group.functions.each do |function|
+                  category = function[0]
+                  all_functions[category] ||= {}
+                  existing_category = all_functions[category][group.scope_id.to_s] || all_functions[category][group.scope_id.to_s] = []
+                  function[1].each do |func|
+                    existing_category.push(func) if !existing_category.include?(func)
+                  end
+                end
+              end
+            end
+          else #groups are not scoped
+            user_groups.each do |group|
+              if !group.functions.nil?
+                group.functions.each do |function|
+                  category = function[0]
+                  existing_category = all_functions[category] || all_functions[category] = []
+                  function[1].each do |func|
+                    existing_category.push(func) if !existing_category.include?(func)
+                  end
                 end
               end
             end
@@ -47,7 +60,11 @@ module UniversalAccess
         #find the groups that this user belongs to
         def universal_user_groups(scope=nil)
           return [] if self._ugid.nil? or self._ugid.empty?
-          @user_groups ||= ::UniversalAccess::UserGroup.in(id: self._ugid, scope: scope).cache
+          if ::UniversalAccess::Configuration.scoped_user_groups
+            @user_groups ||= ::UniversalAccess::UserGroup.in(id: self._ugid, scope: scope).cache
+          else
+            @user_groups ||= ::UniversalAccess::UserGroup.in(id: self._ugid).cache
+          end
         end
 
         def universal_user_group_codes
@@ -58,47 +75,15 @@ module UniversalAccess
           return self._ugf.map{|f| f.to_a[0]} if !self._ugf.nil?
           []
         end
-        
-        def scoped_universal_user_group_functions(scope)
-          return [] if self.universal_user_group_functions.blank? or scope.nil?
-          new_ugf = {}
-          self._ugf.each do |uu|
-            function_group = uu[0]
-            uu[1].each do |uuu|
-              if uuu[0].to_s == scope.id.to_s
-                new_ugf[function_group] ||= []
-                new_ugf[function_group] += uuu[1]
-                new_ugf[function_group].uniq!
-              end
-            end
-          end
-          return new_ugf
-        end
-        
-        def unscoped_user_group_functions
-          return nil if self._ugf.nil?
-          if @unscoped_user_group_functions.nil?
-            new_ugf = {}
-            self._ugf.each do |uu|
-              function_group = uu[0]
-              uu[1].each do |uuu|
-                new_ugf[function_group] ||= []
-                new_ugf[function_group] += uuu[1]
-                new_ugf[function_group].uniq!
-              end
-            end
-            @unscoped_user_group_functions = new_ugf
-          end
-          return @unscoped_user_group_functions
-        end
 
         #check if a user has this function
-        def has?(category, function=nil, scope='all')
+        def has?(category, function=nil, scope=nil)
           return false if self._ugf.nil? or self._ugf[category.to_s].nil?
-          if scope.to_s=='all'
-            return (!self.unscoped_user_group_functions.nil? && !self.unscoped_user_group_functions[category.to_s].nil? and (function.nil? or self.unscoped_user_group_functions[category.to_s].include?(function.to_s)))
-          else
+          if ::UniversalAccess::Configuration.scoped_user_groups
+            raise 'Nil Scope. A scope model must be passed to has? method in UniversalAccess::Concerns::GroupAccess' if scope.nil?
             return (self._ugf[category.to_s].class != Array and !self._ugf[category.to_s][scope.id.to_s].nil? and (function.nil? or self._ugf[category.to_s][scope.id.to_s].include?(function.to_s)))
+          else
+            return (!self._ugf[category.to_s].nil? and (function.nil? or self._ugf[category.to_s].include?(function.to_s)))
           end
         end
 
