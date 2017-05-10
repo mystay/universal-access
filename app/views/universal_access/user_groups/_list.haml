@@ -13,7 +13,7 @@
             - if user_group.users.length>10
               %b= link_to "+ #{user_group.users.length-10} more...", universal_access.users_user_group_path(user_group), remote: true
         %td.small.text-warning
-          = user_group.functions.map{|c| "#{c[0].titleize} (#{c[1].length})"}.join(', ')
+          = user_group.functions.map{|c| "#{c[0].titleize} (#{c[1].length})"}.join(', ') if !user_group.functions.nil?
         %td.text-center
           - if user_group.locked
             .pull-left= icon('lock')
