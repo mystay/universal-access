@@ -67,8 +67,8 @@ module UniversalAccess
           end
         end
 
-        def universal_user_group_codes
-          self.universal_user_groups.map(&:code)
+        def universal_user_group_codes(scope=nil)
+          self.universal_user_groups(scope).map(&:code)
         end
 
         def user_group_function_categories

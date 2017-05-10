@@ -1,9 +1,8 @@
 .row
-  .col-md-7
-    = panel(title: 'Groups', icon: 'cog') do
+  .col-md-8
+    = panel(title: 'Groups', icon: 'group') do
       #user_group_list= render 'list'
-      
-  .col-md-5
+  .col-md-4
     #model_support
     #model_form
       = render 'new'
