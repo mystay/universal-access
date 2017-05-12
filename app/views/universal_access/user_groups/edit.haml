@@ -1,4 +1,8 @@
 %h1 Group: #{@user_group.name}
+%p
+  = @user_group.users[0,10].map{|u| u.name}.join(', ')
+  - if @user_group.users.length>10
+    %b= "+ #{@user_group.users.length-10} more..."
 %hr
 = form_for @user_group, url: universal_access.user_group_path(@user_group), html: {class: 'form-horizontal form-border', id: 'edit_user_group_form'} do
   = tabs(tabs: %w(functions details))
